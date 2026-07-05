@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Campus Championship Cup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --pitch:#0B3D2E;
+    --pitch-deep:#071F17;
+    --lime:#D4FF3F;
+    --chalk:#F1F5EC;
+    --amber:#FFB627;
+    --line:rgba(241,245,236,0.14);
+    --card:rgba(241,245,236,0.05);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--pitch-deep);
+    color:var(--chalk);
+    font-family:'Inter',sans-serif;
+    line-height:1.5;
+  }
+  h1,h2,h3,.display{
+    font-family:'Bebas Neue',sans-serif;
+    letter-spacing:0.03em;
+    line-height:1;
+  }
+  .mono{font-family:'Space Mono',monospace;}
+  a{color:var(--lime);}
+  section{padding:64px 24px;max-width:1000px;margin:0 auto;}
+  /* ---------- HERO ---------- */
+  .hero{
+    position:relative;
+    background:
+      radial-gradient(circle at 20% 20%, rgba(212,255,63,0.08), transparent 45%),
+      linear-gradient(180deg, var(--pitch) 0%, var(--pitch-deep) 100%);
+    padding:90px 24px 70px;
+    text-align:center;
+    overflow:hidden;
+    border-bottom:1px solid var(--line);
+  }
+  .hero::before{
+    content:'';
+    position:absolute; inset:0;
+    background-image:
+      repeating-linear-gradient(90deg, rgba(241,245,236,0.035) 0 1px, transparent 1px 90px);
+    pointer-events:none;
+  }
+  .eyebrow{
+    font-family:'Space Mono',monospace;
+    color:var(--lime);
+    text-transform:uppercase;
+    font-size:12px;
+    letter-spacing:0.25em;
+    margin-bottom:18px;
+  }
+  .hero h1{
+    font-size:clamp(48px,9vw,96px);
+    color:var(--chalk);
+    margin:0;
+  }
+  .hero h1 span{color:var(--lime);}
+  .hero p.sub{
+    max-width:520px;margin:22px auto 34px;
+    color:rgba(241,245,236,0.75);
+    font-size:16px;
+  }
+  .meta-row{
+    display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-bottom:36px;
+  }
+  .meta-pill{
+    border:1px solid var(--line);
+    background:var(--card);
+    padding:8px 16px;border-radius:999px;
+    font-size:13px;font-family:'Space Mono',monospace;
+    color:var(--chalk);
+  }
+  .btn{
+    display:inline-block;
+    background:var(--lime);
+    color:var(--pitch-deep);
+    font-weight:700;
+    font-family:'Inter',sans-serif;
+    padding:14px 30px;
+    border-radius:6px;
+    border:none;
+    cursor:pointer;
+    font-size:15px;
+    text-decoration:none;
+    transition:transform .15s ease, box-shadow .15s ease;
+  }
+  .btn:hover{transform:translateY(-2px); box-shadow:0 8px 24px rgba(212,255,63,0.25);}
+  .btn.secondary{
+    background:transparent;color:var(--chalk);border:1px solid var(--line);
+  }
+  .btn.small{padding:9px 18px;font-size:13px;}
+  .btn:disabled{opacity:0.5;cursor:not-allowed;transform:none;box-shadow:none;}
+  /* ---------- SECTION HEADERS ---------- */
+  .section-head{margin-bottom:32px;}
+  .section-head .num{font-family:'Space Mono',monospace;color:var(--lime);font-size:13px;letter-spacing:0.2em;}
+  .section-head h2{font-size:clamp(32px,5vw,44px);margin:6px 0 0;}
+  /* ---------- DETAILS ---------- */
+  .grid-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;}
+  .card{
+    background:var(--card);border:1px solid var(--line);border-radius:10px;padding:22px;
+  }
+  .card h3{font-family:'Inter',sans-serif;font-weight:600;font-size:15px;margin:0 0 8px;color:var(--lime);}
+  .card p{margin:0;font-size:14px;color:rgba(241,245,236,0.8);}
+  .rules-list{padding-left:18px;margin:0;color:rgba(241,245,236,0.8);font-size:14px;}
+  .rules-list li{margin-bottom:8px;}
+  /* ---------- REGISTER ---------- */
+  .register-wrap{
+    display:grid;grid-template-columns:1.1fr 0.9fr;gap:36px;
+  }
+  @media (max-width:760px){.register-wrap{grid-template-columns:1fr;}}
+  form{display:flex;flex-direction:column;gap:14px;}
+  label{font-size:12px;text-transform:uppercase;letter-spacing:0.08em;color:rgba(241,245,236,0.6);margin-bottom:6px;display:block;}
+  input,select{
+    width:100%;background:var(--pitch-deep);border:1px solid var(--line);color:var(--chalk);
+    padding:12px 14px;border-radius:6px;font-family:'Inter',sans-serif;font-size:14px;
+  }
+  input:focus,select:focus{outline:2px solid var(--lime);outline-offset:1px;border-color:transparent;}
+  .field-err{color:var(--amber);font-size:12px;margin-top:-8px;display:none;}
+  .status-msg{font-size:13px;margin-top:6px;display:none;}
+  .status-msg.ok{color:var(--lime);}
+  .status-msg.err{color:var(--amber);}
+  .roster-box{
+    background:var(--card);border:1px solid var(--line);border-radius:10px;padding:22px;
+    max-height:420px;overflow-y:auto;
+  }
+  .roster-box h3{font-family:'Inter',sans-serif;font-size:14px;text-transform:uppercase;letter-spacing:0.08em;color:rgba(241,245,236,0.6);margin:0 0 14px;display:flex;justify-content:space-between;align-items:center;}
+  .roster-count{font-family:'Space Mono',monospace;color:var(--lime);}
+  .chip{
+    display:flex;align-items:center;gap:10px;
+    padding:9px 4px;border-bottom:1px solid var(--line);font-size:14px;
+  }
+  .chip .seed{font-family:'Space Mono',monospace;color:rgba(241,245,236,0.4);font-size:12px;width:24px;}
+  .empty-note{color:rgba(241,245,236,0.45);font-size:13px;}
+  /* ---------- ADMIN ---------- */
+  .admin-toggle{
+    text-align:center;margin-top:44px;
+  }
+  .admin-toggle button{
+    background:none;border:none;color:rgba(241,245,236,0.35);font-size:12px;
+    font-family:'Space Mono',monospace;cursor:pointer;letter-spacing:0.1em;text-transform:uppercase;
+  }
+  .admin-panel{
+    margin-top:20px;background:var(--card);border:1px dashed var(--line);border-radius:10px;padding:24px;
+    display:none;
+  }
+  .admin-panel.open{display:block;}
+  .admin-panel .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+  /* ---------- BRACKET ---------- */
+  .bracket-scroll{overflow-x:auto;padding-bottom:10px;}
+  .bracket{display:flex;gap:48px;min-width:600px;padding:20px 4px;}
+  .round{display:flex;flex-direction:column;justify-content:space-around;min-width:200px;}
+  .round-label{
+    font-family:'Space Mono',monospace;font-size:11px;letter-spacing:0.15em;text-transform:uppercase;
+    color:var(--lime);text-align:center;margin-bottom:16px;
+  }
+  .match{
+    position:relative;border:1px solid var(--line);background:var(--pitch-deep);
+    border-radius:8px;margin:14px 0;
+  }
+  .match .p{
+    padding:10px 14px;font-size:13px;border-bottom:1px solid var(--line);
+    display:flex;justify-content:space-between;
+  }
+  .match .p:last-child{border-bottom:none;}
+  .match .p.bye{color:rgba(241,245,236,0.35);font-style:italic;}
+  .round:not(:last-child) .match::after{
+    content:'';position:absolute;top:50%;right:-24px;width:24px;height:1px;background:var(--line);
+  }
+  .final-glow{
+    box-shadow:0 0 0 1px var(--lime), 0 0 30px rgba(212,255,63,0.25);
+  }
+  .empty-bracket{
+    text-align:center;color:rgba(241,245,236,0.45);font-size:14px;padding:40px 0;
+  }
+  footer{
+    text-align:center;padding:30px;font-size:12px;color:rgba(241,245,236,0.35);
+    font-family:'Space Mono',monospace;border-top:1px solid var(--line);
+  }
+  @media print{
+    body *{ visibility:hidden; }
+    #bracket, #bracket *{ visibility:visible; }
+    #bracket{ position:absolute; top:0; left:0; width:100%; padding:0; }
+    .no-print{ display:none !important; }
+    body{ background:#fff; color:#000; }
+    .match{ border-color:#000; background:#fff; }
+    .round-label{ color:#000; }
+    .final-glow{ box-shadow:none; }
+    .num{ color:#000; }
+  }
+</style>
+</head>
+<body>
+
+  <!-- ============ HERO ============ -->
+  <div class="hero">
+    <div class="eyebrow">Knockout Format · Open Registration</div>
+    <h1>CAMPUS<br><span>CHAMPIONSHIP</span> CUP</h1>
+    <p class="sub">Single-elimination tournament open to all players. Register your spot below — the bracket is drawn automatically once registration closes.</p>
+    <div class="meta-row">
+      <div class="meta-pill">📅  Date: 6 july</div>
+      <div class="meta-pill">📍 venue: SUST</div>
+      <div class="meta-pill">🏆 trophy</div>
+    </div>
+    <a href="#register" class="btn">Register Now</a>
+  </div>
+
+  <!-- ============ EVENT DETAILS ============ -->
+  <section id="details">
+    <div class="section-head">
+      <div class="num">01 — DETAILS</div>
+      <h2>Event Info</h2>
+    </div>
+    <div class="grid-cards">
+      <div class="card">
+        <h3>Format</h3>
+        <p>Single-elimination knockout. Lose once, you're out. Bracket seeding is randomized once registration closes.</p>
+      </div>
+      <div class="card">
+        <h3>Eligibility</h3>
+        <p>EDIT: e.g. Open to all current students. One registration per player.</p>
+      </div>
+      <div class="card">
+        <h3>Schedule</h3>
+        <p>EDIT: Registration closes on [date]. Matches begin [date]. Fixture will be posted on this page.</p>
+      </div>
+      <div class="card">
+        <h3>Prize</h3>
+        <p>EDIT: Winner takes [prize]. Runner-up receives [prize].</p>
+      </div>
+    </div>
+    <ul class="rules-list" style="margin-top:24px;">
+      <li>EDIT: Rule 1 — e.g. match duration / scoring format.</li>
+      <li>EDIT: Rule 2 — e.g. walkover if a player doesn't show within 10 minutes.</li>
+      <li>EDIT: Rule 3 — e.g. disputes are resolved by the organizing committee.</li>
+    </ul>
+  </section>
+
+  <!-- ============ REGISTRATION ============ -->
+  <section id="register">
+    <div class="section-head">
+      <div class="num">02 — JOIN</div>
+      <h2>Register to Play</h2>
+    </div>
+    <div class="register-wrap">
+      <div>
+        <div class="card" style="margin-bottom:20px;">
+          <h3>Entry Fee — EDIT: ৳XXX</h3>
+          <p>
+            Send the entry fee to one of these numbers, then enter the Transaction ID below.
+            Your spot is confirmed once the organizer verifies the payment.<br><br>
+            <span class="mono">bKash (Send Money): 878978987789</span><br>
+            <span class="mono">Nagad (Send Money): 89898998</span><br>
+            <span class="mono">Rocket (Send Money): 32342342</span>
+          </p>
+        </div>
+        <form id="regForm">
+          <div>
+            <label for="fname">Full Name</label>
+            <input type="text" id="fname" required>
+          </div>
+          <div>
+            <label for="fphone">Phone Number</label>
+            <input type="tel" id="fphone" required>
+          </div>
+          <div>
+            <label for="femail">Email (optional)</label>
+            <input type="email" id="femail">
+          </div>
+          <div>
+            <label for="finst">Department / Institution (optional)</label>
+            <input type="text" id="finst">
+          </div>
+          <div>
+            <label for="fpaymethod">Payment Method</label>
+            <select id="fpaymethod" required>
+              <option value="">Select method</option>
+              <option value="bKash">bKash</option>
+              <option value="Nagad">Nagad</option>
+              <option value="Rocket">Rocket</option>
+            </select>
+          </div>
+          <div>
+            <label for="fpaynumber">Number You Sent From</label>
+            <input type="tel" id="fpaynumber" required>
+          </div>
+          <div>
+            <label for="ftxnid">Transaction ID</label>
+            <input type="text" id="ftxnid" required placeholder="e.g. 8N7A2XJ4KQ">
+          </div>
+          <div>
+            <label for="famount">Amount Sent (৳)</label>
+            <input type="number" id="famount" min="0" required>
+          </div>
+          <button type="submit" class="btn" id="submitBtn">Submit Registration</button>
+          <div class="status-msg" id="regStatus"></div>
+        </form>
+      </div>
+      <div class="roster-box">
+        <h3>Registered Players <span class="roster-count" id="rosterCount">0</span></h3>
+        <p class="empty-note" id="rosterPublicNote">Player names are kept private and will be revealed when the bracket is published.</p>
+      </div>
+    </div>
+
+    <div class="admin-toggle">
+      <button id="adminToggleBtn">Organizer Login</button>
+    </div>
+    <div class="admin-panel" id="adminPanel">
+      <div class="row" id="adminLoginRow">
+        <input type="password" id="adminPass" placeholder="Organizer password" style="max-width:220px;">
+        <button class="btn small" id="adminLoginBtn">Unlock</button>
+        <span class="status-msg err" id="adminErr" style="display:none;">Wrong password.</span>
+      </div>
+      <div id="adminControls" style="display:none;margin-top:14px;">
+        <h3 style="font-family:'Inter',sans-serif;font-size:14px;text-transform:uppercase;letter-spacing:0.08em;color:rgba(241,245,236,0.6);">All Registered Players (private)</h3>
+        <div id="fullRosterList" style="max-height:260px;overflow-y:auto;margin-bottom:20px;"><p class="empty-note">Loading…</p></div>
+
+        <h3 style="font-family:'Inter',sans-serif;font-size:14px;text-transform:uppercase;letter-spacing:0.08em;color:rgba(241,245,236,0.6);">Payments Awaiting Verification</h3>
+        <div id="pendingList"><p class="empty-note">Loading…</p></div>
+
+        <p style="font-size:13px;color:rgba(241,245,236,0.6);margin-top:24px;">Only verified (paid) players are included when you generate the fixture. Do this once registration is closed.</p>
+        <div class="row">
+          <button class="btn small" id="genFixtureBtn">Generate Fixture</button>
+          <button class="btn small secondary" id="resetFixtureBtn">Reset Fixture</button>
+          <button class="btn small secondary" id="resetAllBtn">Reset Everything (players + fixture)</button>
+        </div>
+        <div class="status-msg" id="adminStatus"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ BRACKET ============ -->
+  <section id="bracket">
+    <div class="section-head" style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:12px;">
+      <div>
+        <div class="num">03 — BRACKET</div>
+        <h2>Fixture</h2>
+      </div>
+      <button class="btn small secondary no-print" id="printBracketBtn">🖨 Print Fixture</button>
+    </div>
+    <div id="bracketWrap">
+      <div class="empty-bracket">Fixture hasn't been generated yet. Check back after registration closes.</div>
+    </div>
+  </section>
+
+  <footer>Built for the tournament · powered by Claude</footer>
+
+<script>
+/* =========================================================
+   EDIT ME (2 things before this site works):
+   1. Change this password before sharing the link
+   2. Paste your Google Apps Script Web App URL below
+   ========================================================= */
+const ADMIN_PASSWORD = "changeme123";
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwK16byNWgu6k5C7we6n4B7QKo5H99OEBGjUHuYARjKVkcWqzd2Ar8AdUB-0075Qm93/exec";
+
+async function apiGet(action){
+  const res = await fetch(`${APPS_SCRIPT_URL}?action=${action}`);
+  if(!res.ok) throw new Error("Network error");
+  return res.json();
+}
+async function apiPost(payload){
+  const res = await fetch(APPS_SCRIPT_URL, {
+    method: "POST",
+    headers: { "Content-Type": "text/plain" }, // avoids CORS preflight with Apps Script
+    body: JSON.stringify(payload)
+  });
+  if(!res.ok) throw new Error("Network error");
+  return res.json();
+}
+
+/* ---------- helpers ---------- */
+function el(id){ return document.getElementById(id); }
+function showStatus(node, msg, ok){
+  node.textContent = msg;
+  node.style.display = "block";
+  node.className = "status-msg " + (ok ? "ok" : "err");
+}
+
+/* ---------- load & render roster ---------- */
+let cachedPlayers = [];
+
+async function loadPlayers(){
+  try{
+    const players = await apiGet("list");
+    players.sort((a,b) => (a.registeredAt||0) - (b.registeredAt||0));
+    cachedPlayers = players;
+    el("rosterCount").textContent = players.length;
+    renderFullRoster(players);
+    renderPendingList(players);
+    return players;
+  }catch(e){
+    el("rosterPublicNote").textContent = "Could not load registration count. Check the Apps Script URL is set correctly.";
+    return [];
+  }
+}
+
+function renderFullRoster(players){
+  const node = el("fullRosterList");
+  if(!node) return; // only exists inside the admin panel
+  if(players.length === 0){
+    node.innerHTML = '<p class="empty-note">No one has registered yet.</p>';
+    return;
+  }
+  node.innerHTML = players.map((p,i) =>
+    `<div class="chip"><span class="seed">${String(i+1).padStart(2,'0')}</span><span>${p.verified === true || p.verified === "TRUE" ? '✅' : '⏳'}</span><span>${escapeHtml(p.name)} — ${escapeHtml(p.phone||'')}</span></div>`
+  ).join("");
+}
+
+function renderPendingList(players){
+  const node = el("pendingList");
+  if(!node) return;
+  const pending = players.filter(p => p.verified !== true && p.verified !== "TRUE");
+  if(pending.length === 0){
+    node.innerHTML = '<p class="empty-note">No payments waiting on verification.</p>';
+    return;
+  }
+  node.innerHTML = pending.map(p => `
+    <div class="chip" style="flex-wrap:wrap;">
+      <div style="flex:1;min-width:200px;">
+        <strong>${escapeHtml(p.name)}</strong> — ${escapeHtml(p.phone||'')}<br>
+        <span class="mono" style="font-size:12px;color:rgba(241,245,236,0.6);">
+          ${escapeHtml(p.paymentMethod||'')} · from ${escapeHtml(p.paymentNumber||'')} · txn ${escapeHtml(p.transactionId||'')} · ৳${escapeHtml(String(p.amount||''))}
+        </span>
+      </div>
+      <button class="btn small" data-verify="${p.id}">Mark Paid</button>
+      <button class="btn small secondary" data-reject="${p.id}">Remove</button>
+    </div>
+  `).join("");
+
+  node.querySelectorAll("[data-verify]").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      const id = btn.getAttribute("data-verify");
+      btn.disabled = true;
+      try{
+        await apiPost({ action: "verify", id });
+        await loadPlayers();
+      }catch(e){ btn.disabled = false; }
+    });
+  });
+  node.querySelectorAll("[data-reject]").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      const id = btn.getAttribute("data-reject");
+      if(!confirm("Remove this registration?")) return;
+      btn.disabled = true;
+      try{
+        await apiPost({ action: "delete", id });
+        await loadPlayers();
+      }catch(e){ btn.disabled = false; }
+    });
+  });
+}
+
+function escapeHtml(str){
+  const d = document.createElement("div");
+  d.textContent = str || "";
+  return d.innerHTML;
+}
+
+/* ---------- registration form ---------- */
+el("regForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const btn = el("submitBtn");
+  const status = el("regStatus");
+  const name = el("fname").value.trim();
+  const phone = el("fphone").value.trim();
+  const email = el("femail").value.trim();
+  const inst = el("finst").value.trim();
+  const paymentMethod = el("fpaymethod").value;
+  const paymentNumber = el("fpaynumber").value.trim();
+  const transactionId = el("ftxnid").value.trim();
+  const amount = el("famount").value;
+
+  if(!name || !phone || !paymentMethod || !paymentNumber || !transactionId || !amount){
+    showStatus(status, "Please fill in all fields, including payment details.", false);
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = "Submitting…";
+  try{
+    const id = Date.now() + "-" + Math.random().toString(36).slice(2,8);
+    const result = await apiPost({
+      action: "register",
+      player: { id, name, phone, email, institution: inst, paymentMethod, paymentNumber, transactionId, amount, registeredAt: Date.now() }
+    });
+    if(!result || !result.success){ throw new Error("write failed"); }
+    showStatus(status, "Submitted! Your spot is pending payment verification by the organizer.", true);
+    el("regForm").reset();
+    await loadPlayers();
+  }catch(err){
+    showStatus(status, "Something went wrong — please try again.", false);
+  }finally{
+    btn.disabled = false;
+    btn.textContent = "Submit Registration";
+  }
+});
+
+/* ---------- admin login ---------- */
+el("adminToggleBtn").addEventListener("click", () => {
+  el("adminPanel").classList.toggle("open");
+});
+el("adminLoginBtn").addEventListener("click", () => {
+  const val = el("adminPass").value;
+  if(val === ADMIN_PASSWORD){
+    el("adminLoginRow").style.display = "none";
+    el("adminControls").style.display = "block";
+  }else{
+    el("adminErr").style.display = "inline";
+  }
+});
+
+/* ---------- fixture generation ---------- */
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i = a.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i+1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+function nextPowerOfTwo(n){
+  let p = 1;
+  while(p < n) p *= 2;
+  return p;
+}
+function roundLabel(roundIndex, totalRounds){
+  const fromEnd = totalRounds - roundIndex;
+  if(fromEnd === 1) return "Final";
+  if(fromEnd === 2) return "Semifinal";
+  if(fromEnd === 3) return "Quarterfinal";
+  return "Round " + (roundIndex + 1);
+}
+
+function buildBracket(players){
+  const shuffled = shuffle(players.map(p => p.name));
+  const bracketSize = nextPowerOfTwo(shuffled.length);
+  const byes = bracketSize - shuffled.length;
+
+  // players who get a bye advance straight to round 2
+  const byePlayers = shuffled.slice(0, byes);
+  const playing = shuffled.slice(byes);
+
+  const round1 = [];
+  for(let i = 0; i < playing.length; i += 2){
+    round1.push({ p1: playing[i], p2: playing[i+1] || null });
+  }
+
+  const totalRounds = Math.log2(bracketSize);
+  const rounds = [];
+  rounds.push({ matches: round1.map(m => ({ p1: m.p1, p2: m.p2, isBye: m.p2 === null })) });
+
+  // seed byes as already-placed entrants into round 2 slots, rest are TBD
+  let slotsNeeded = bracketSize / 2 - round1.length; // remaining round-2 slots not filled by byes directly... simplified below
+  let round2Entrants = byePlayers.slice();
+  let round1WinnersCount = round1.length;
+
+  for(let r = 1; r < totalRounds; r++){
+    const matchesInRound = bracketSize / Math.pow(2, r+1);
+    const matches = [];
+    for(let i = 0; i < matchesInRound; i++){
+      let p1 = null, p2 = null;
+      if(r === 1){
+        // fill with byes first, then TBD winners of round1
+        p1 = round2Entrants[i*2] || `Winner of Match ${i*2+1}`;
+        p2 = round2Entrants[i*2+1] || `Winner of Match ${i*2+2}`;
+      }else{
+        p1 = `Winner of ${roundLabel(r-1, totalRounds)} ${i*2+1}`;
+        p2 = `Winner of ${roundLabel(r-1, totalRounds)} ${i*2+2}`;
+      }
+      matches.push({ p1, p2, isBye:false, tbd: true });
+    }
+    rounds.push({ matches });
+  }
+
+  return { rounds, totalRounds, generatedAt: Date.now(), playerCount: shuffled.length };
+}
+
+function renderBracket(fixture){
+  const wrap = el("bracketWrap");
+  if(!fixture){
+    wrap.innerHTML = '<div class="empty-bracket">Fixture hasn\'t been generated yet. Check back after registration closes.</div>';
+    return;
+  }
+  const { rounds, totalRounds } = fixture;
+  let html = '<div class="bracket-scroll"><div class="bracket">';
+  rounds.forEach((round, rIdx) => {
+    const isFinal = rIdx === rounds.length - 1;
+    html += `<div class="round"><div class="round-label">${roundLabel(rIdx, totalRounds)}</div>`;
+    round.matches.forEach(m => {
+      html += `<div class="match ${isFinal ? 'final-glow' : ''}">
+        <div class="p ${m.isBye ? '' : ''}">${escapeHtml(m.p1)}</div>
+        <div class="p ${m.isBye ? 'bye' : ''}">${m.p2 ? escapeHtml(m.p2) : 'BYE'}</div>
+      </div>`;
+    });
+    html += `</div>`;
+  });
+  html += '</div></div>';
+  wrap.innerHTML = html;
+}
+
+async function loadFixture(){
+  try{
+    const r = await apiGet("fixture");
+    if(r && r.fixture){
+      renderBracket(JSON.parse(r.fixture));
+    }else{
+      renderBracket(null);
+    }
+  }catch(e){
+    renderBracket(null);
+  }
+}
+
+el("genFixtureBtn").addEventListener("click", async () => {
+  const status = el("adminStatus");
+  const btn = el("genFixtureBtn");
+  btn.disabled = true;
+  try{
+    const allPlayers = await loadPlayers();
+    const players = allPlayers.filter(p => p.verified === true || p.verified === "TRUE");
+    if(players.length < 2){
+      showStatus(status, "Need at least 2 payment-verified players to generate a fixture.", false);
+      return;
+    }
+    const fixture = buildBracket(players);
+    const result = await apiPost({ action: "setFixture", fixture: JSON.stringify(fixture) });
+    if(!result || !result.success){ throw new Error("write failed"); }
+    showStatus(status, `Fixture generated for ${players.length} players.`, true);
+    renderBracket(fixture);
+  }catch(e){
+    showStatus(status, "Could not generate the fixture. Try again.", false);
+  }finally{
+    btn.disabled = false;
+  }
+});
+
+el("resetFixtureBtn").addEventListener("click", async () => {
+  const status = el("adminStatus");
+  try{
+    await apiPost({ action: "deleteFixture" });
+    renderBracket(null);
+    showStatus(status, "Fixture cleared.", true);
+  }catch(e){
+    showStatus(status, "Nothing to clear or an error occurred.", false);
+  }
+});
+
+el("resetAllBtn").addEventListener("click", async () => {
+  const status = el("adminStatus");
+  if(!confirm("This deletes all registered players AND the fixture. Continue?")) return;
+  try{
+    await apiPost({ action: "resetAll" });
+    await loadPlayers();
+    renderBracket(null);
+    showStatus(status, "Everything has been reset.", true);
+  }catch(e){
+    showStatus(status, "Reset failed — refresh and check.", false);
+  }
+});
+
+el("printBracketBtn").addEventListener("click", () => {
+  window.print();
+});
+
+/* ---------- init ---------- */
+loadPlayers();
+loadFixture();
+</script>
+</body>
+</html>
